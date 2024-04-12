@@ -28,7 +28,6 @@ exports.createMessage = async (req, res) => {
     await newMessage.save();
     console.log(newMessage);
 
-
     const clients = req.app.locals.clients;
     const message = {
       data: newMessage,
@@ -174,6 +173,23 @@ exports.likeMessage = async (req, res) => {
     } else {
       message.likes.push(userId);
     }
+
+    const authorId = message.author;
+    const author = await User.findById(authorId);
+    if (!author) {
+      return response({
+        res,
+        status: 404,
+        message: "Author not found",
+      });
+    }
+
+    if (successMessage === "Message liked") {
+      author.postsLiked.push(_id);
+    } else {
+      author.postsLiked.pull(_id);
+    }
+    await author.save();
 
     await message.save();
 

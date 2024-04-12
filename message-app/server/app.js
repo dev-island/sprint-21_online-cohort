@@ -44,6 +44,7 @@ ws.on("connection", (webSocket) => {
 
 app.use("/messages", messagesRouter);
 app.use("/users", usersRouter);
+app.use("/notifications", notificationsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
