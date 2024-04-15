@@ -9,6 +9,7 @@ export const createOrUpdate = async (user: User) => {
     },
     body: JSON.stringify(user),
   });
+  console.log("user res", res);
   return res.json();
 };
 

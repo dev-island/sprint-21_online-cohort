@@ -51,7 +51,7 @@ const UserProvider: FC<{ children: ReactNode }> = ({ children }) => {
   };
 
   const fetchCurrentUser = async () => {
-
+    debugger;
     if (isLoading || !isAuthenticated || !auth0User?.sub || !token) {
       return;
     }
@@ -75,7 +75,7 @@ const UserProvider: FC<{ children: ReactNode }> = ({ children }) => {
       return;
     }
     const token = await getAccessTokenSilently();
-    console.log("TOKEN", token)
+    console.log("TOKEN", token);
     if (!token) {
       throw new Error("Failed to get token");
     }
@@ -99,7 +99,7 @@ const UserProvider: FC<{ children: ReactNode }> = ({ children }) => {
       return;
     }
     // Use the sub from the auth0User to fetch the user from our DB
-    fetchCurrentUser();
+    // fetchCurrentUser();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 

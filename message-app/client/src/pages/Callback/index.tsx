@@ -6,7 +6,9 @@ import * as api from "../../api/users";
 import useCurrentUser from "../../hooks/useCurrentUser";
 
 const Callback = () => {
-  const { isAuthenticated, isLoading, user, getAccessTokenSilently } = useAuth0();
+  console.log("Potato");
+  const { isAuthenticated, isLoading, user, getAccessTokenSilently } =
+    useAuth0();
   const { setCurrentUser, setToken } = useCurrentUser();
   const navigate = useNavigate();
   // Once we have the user, send a request to the server to create a new user in our database
@@ -15,6 +17,7 @@ const Callback = () => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleCreateOrUpdate = async () => {
+    debugger;
     if (isLoading || !isAuthenticated || !user) return;
     const { data } = await api.createOrUpdate(user);
     if (!data) {

@@ -15,7 +15,7 @@ function App() {
   const { isLoading: isLoadingAuth } = useAuth0();
   const { isLoading: isLoadingNotifications } = useNotifications();
   const isLoading = isLoadingAuth || isLoadingNotifications;
-
+  console.log("loading?", { isLoadingAuth, isLoadingNotifications });
   return (
     <Layout>
       {isLoading ? (
