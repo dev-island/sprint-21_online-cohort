@@ -3,11 +3,11 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const MessageSchema = new Schema({
+const NotificationSchema = new Schema({
   type: {
     type: String,
     required: true,
-    enum: ["LIKE", "FOLLOW", 'NEW_MESSAGE'],
+    enum: ["LIKE", "FOLLOW", "NEW_MESSAGE"],
   },
   createdDate: {
     type: Date,
@@ -27,4 +27,4 @@ const MessageSchema = new Schema({
   },
 });
 
-module.exports = mongoose.model("Message", MessageSchema);
+module.exports = mongoose.model("Notification", NotificationSchema);

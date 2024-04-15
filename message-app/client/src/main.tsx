@@ -4,7 +4,7 @@ import App from "./App.tsx";
 import "./index.css";
 import { ChakraProvider } from "@chakra-ui/react";
 import { BrowserRouter } from "react-router-dom";
-import MessagesProvider from "./context/MessagesContext.tsx";
+import MessagesProvider from "./context/messagesContext.tsx";
 import { Auth0Provider } from "@auth0/auth0-react";
 import UserProvider from "./context/UserContext.tsx";
 import NotificationsProvider from "./context/NotificationsContext.tsx";

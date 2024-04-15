@@ -10,6 +10,16 @@ const messagesRouter = require("./routes/message.routes");
 const usersRouter = require("./routes/user.routes");
 const port = process.env.PORT || "3000";
 const WebSocket = require("ws");
+// const { auth } = require("express-openid-connect");
+
+// const config = {
+//   authRequired: false,
+//   auth0Logout: true,
+//   secret: AUTH0_SECRET,
+//   baseURL: "http://localhost:3000",
+//   clientID: "9qW51jDdDqBMsxLWj0JEFEDyaFop4dup",
+//   issuerBaseURL: "https://dev-iwo3s7ya82pzsqds.us.auth0.com",
+// };
 
 // Connect to db
 mongoose
@@ -42,6 +52,7 @@ ws.on("connection", (webSocket) => {
 
 // main user dashboard GET
 
+// app.use(auth(config));
 app.use("/messages", messagesRouter);
 app.use("/users", usersRouter);
 
@@ -61,6 +72,10 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render("error");
 });
+
+// app.get("/", (req, res) => {
+//   res.send(req.oidc.isAuthenticated() ? "Logged in" : "Logged out");
+// });
 
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);

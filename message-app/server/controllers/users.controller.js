@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const response = require("../helpers/response");
+const { broadcast } = require("../helpers/websockets");
 
 exports.createOrUpdateUser = async (req, res) => {
   try {
@@ -11,6 +12,7 @@ exports.createOrUpdateUser = async (req, res) => {
         message: "Request body is missing",
       });
     }
+    console.log("meBody", body);
     const { nickname, sub, email, name, picture } = body;
     if (!sub || !email || !nickname) {
       return response({
@@ -57,6 +59,7 @@ exports.createOrUpdateUser = async (req, res) => {
 };
 
 exports.getUser = async (req, res) => {
+  console.log("params -", req.params);
   try {
     const { sub } = req.params;
     if (!sub) {
@@ -67,7 +70,9 @@ exports.getUser = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ sub }).populate("followers").populate("following");
+    const user = await User.findOne({ sub })
+      .populate("followers")
+      .populate("following");
     if (!user) {
       return response({
         res,
@@ -91,7 +96,7 @@ exports.getUser = async (req, res) => {
       message: "Server error",
     });
   }
-}
+};
 
 exports.updateUser = async (req, res) => {
   try {
@@ -114,7 +119,9 @@ exports.updateUser = async (req, res) => {
       });
     }
 
-    const updatedUser = await User.findOneAndUpdate({ sub }, body, { new: true });
+    const updatedUser = await User.findOneAndUpdate({ sub }, body, {
+      new: true,
+    });
     return response({
       res,
       status: 200,
@@ -129,7 +136,7 @@ exports.updateUser = async (req, res) => {
       message: "Server error",
     });
   }
-}
+};
 
 exports.listUsers = async (req, res) => {
   try {
@@ -148,7 +155,7 @@ exports.listUsers = async (req, res) => {
       message: "Server error",
     });
   }
-}
+};
 
 exports.followUser = async (req, res) => {
   try {
@@ -181,7 +188,10 @@ exports.followUser = async (req, res) => {
       });
     }
 
-    if (currentUser.following.includes(targetUser._id) || targetUser.followers.includes(currentUserId)) {
+    if (
+      currentUser.following.includes(targetUser._id) ||
+      targetUser.followers.includes(currentUserId)
+    ) {
       return response({
         res,
         status: 400,
@@ -195,6 +205,15 @@ exports.followUser = async (req, res) => {
     await currentUser.save();
     // TODO add notification
 
+    const notification = new Notification({
+      type: "FOLLOW",
+      user: targetUser._id,
+      author: currentUser._id,
+    });
+    await notification.save();
+
+    broadcast(targetUser._id, notification);
+
     return response({
       res,
       status: 200,
@@ -202,7 +221,7 @@ exports.followUser = async (req, res) => {
       data: {
         targetUser,
         currentUser,
-      }
+      },
     });
   } catch (error) {
     console.error(error);
@@ -212,7 +231,7 @@ exports.followUser = async (req, res) => {
       message: "Server error",
     });
   }
-}
+};
 
 exports.unFollowUser = async (req, res) => {
   try {

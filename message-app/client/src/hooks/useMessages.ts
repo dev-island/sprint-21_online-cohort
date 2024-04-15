@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { MessagesContext } from "../context/MessagesContext";
+import { MessagesContext } from "../context/messagesContext";
 import useCurrentUser from "./useCurrentUser";
 import * as api from "../api/messages";
 import { IUser } from "../types";

@@ -6,6 +6,7 @@ import {
   useEffect,
   useMemo,
 } from "react";
+import { useAuth0 } from "@auth0/auth0-react";
 import { Notification, IUser } from "../types";
 import { markRead } from "../api/notifications";
 import { getUserNotifications } from "../api/users";
@@ -23,7 +24,7 @@ export type NotificationContextType = {
 
 const initState: NotificationContextType = {
   notifications: undefined,
-  isLoading: true,
+  isLoading: false,
   hasUnreadNotifications: false,
   addNotification: () => {},
   markNotificationRead: () => {},
@@ -47,8 +48,9 @@ export const NotificationsContext =
 
 const NotificationsProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const { currentUser, token } = useCurrentUser();
+  const { isLoading: isLoadingAuth } = useAuth0();
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const hasUnreadNotifications = useMemo(() => {
     return notifications.some((notification) => !notification.isRead);
@@ -86,14 +88,15 @@ const NotificationsProvider: FC<{ children: ReactNode }> = ({ children }) => {
   };
 
   useEffect(() => {
+    setIsLoading(false);
+    if (isLoadingAuth) return;
     if (!currentUser?.sub || !token) return;
 
     // TODO -> Swap with fetchNotifications once BE is working
     const mockNotifications = getMockNotifications(currentUser);
     setNotifications(mockNotifications);
-    setIsLoading(false);
     // fetchNotifications();
-  }, [currentUser, token]);
+  }, [currentUser, token, isLoadingAuth]);
 
   return (
     <NotificationsContext.Provider
