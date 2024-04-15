@@ -12,6 +12,7 @@ exports.createOrUpdateUser = async (req, res) => {
         message: "Request body is missing",
       });
     }
+    console.log("meBody", body);
     const { nickname, sub, email, name, picture } = body;
     if (!sub || !email || !nickname) {
       return response({
@@ -58,6 +59,7 @@ exports.createOrUpdateUser = async (req, res) => {
 };
 
 exports.getUser = async (req, res) => {
+  console.log("params -", req.params);
   try {
     const { sub } = req.params;
     if (!sub) {
