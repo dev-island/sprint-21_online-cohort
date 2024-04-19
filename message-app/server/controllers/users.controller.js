@@ -245,7 +245,13 @@ exports.followUser = async (req, res) => {
     currentUser.following.push(targetUser._id);
     await targetUser.save();
     await currentUser.save();
-    // TODO add notification
+
+    const newNotification = new Notification({
+      action: "FOLLOW",
+      recipient: targetUser._id,
+      actor: currentUser._id,
+    });
+    await newNotification.save();
 
     return response({
       res,
