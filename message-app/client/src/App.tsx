@@ -7,18 +7,28 @@ import Callback from "./pages/Callback";
 import AuthRoute from "./components/AuthRoute";
 import { useAuth0 } from "@auth0/auth0-react";
 import Loading from "./components/Loading";
+import useCurrentUser from "./hooks/useCurrentUser";
 import useSocket from "./hooks/useSocket";
+import useMessages from "./hooks/useMessages";
 import useNotifications from "./hooks/useNotifications";
+import { useEffect } from "react";
 
 function App() {
-  useSocket();
+  const { addMessage } = useMessages();
+  const { addNotification } = useNotifications();
+  const { currentUser } = useCurrentUser();
   const { isLoading: isLoadingAuth } = useAuth0();
-  const { isLoading: isLoadingNotifications } = useNotifications();
-  const isLoading = isLoadingAuth || isLoadingNotifications;
+  const { sendMessage } = useSocket({ addMessage, addNotification });
+
+  useEffect(() => {
+    if (!currentUser) return;
+    console.log("Current user: ", currentUser);
+    sendMessage(JSON.stringify({ userId: currentUser._id }));
+  }, [currentUser]);
 
   return (
     <Layout>
-      {isLoading ? (
+      {isLoadingAuth ? (
         <Loading />
       ) : (
         <Routes>

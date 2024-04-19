@@ -36,9 +36,20 @@ const server = http.createServer(app);
 const ws = new WebSocket.Server({ server });
 
 ws.on("connection", (webSocket) => {
-  console.info("Total connected clients:", ws.clients.size);
-  ws.clients.forEach((client) => console.log(client));
-  app.locals.clients = ws.clients;
+  webSocket.on("message", (data, isBinary) => {
+    const message = isBinary ? data : data.toString();
+    const { userId } = JSON.parse(message);
+    ws.clients.forEach((client) => {
+    if (client === webSocket) {
+      console.log("Client connected");
+      client.userId = userId;
+      console.log("App locals", app.locals.clients);
+    }
+    });
+
+    console.info("Total connected clients:", ws.clients.size);
+    app.locals.clients = ws.clients;
+  });
 });
 
 // main user dashboard GET

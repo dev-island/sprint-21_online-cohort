@@ -27,9 +27,9 @@ export type IMessage = {
 export type Notification = {
   _id: string;
   __v: number;
-  type: "LIKE" | "FOLLOW" | "NEW_MESSAGE";
+  action: "LIKE" | "FOLLOW" | "NEW_MESSAGE";
   createdDate: string;
-  user: IUser;
-  author: IUser;
+  recipient: IUser;
+  actor: IUser;
   isRead: boolean;
 };

@@ -1,4 +1,4 @@
-const Notification = require('../models/Notification');
+const Notification = require("../models/Notification");
 
 exports.list = async (req, res) => {
   try {
@@ -7,4 +7,18 @@ exports.list = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-}
+};
+
+exports.markRead = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const notification = await Notification.findByIdAndUpdate(
+      id,
+      { isRead: true },
+      { new: true }
+    );
+    res.json(notification);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

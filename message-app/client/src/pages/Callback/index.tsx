@@ -6,7 +6,8 @@ import * as api from "../../api/users";
 import useCurrentUser from "../../hooks/useCurrentUser";
 
 const Callback = () => {
-  const { isAuthenticated, isLoading, user, getAccessTokenSilently } = useAuth0();
+  const { isAuthenticated, isLoading, user, getAccessTokenSilently } =
+    useAuth0();
   const { setCurrentUser, setToken } = useCurrentUser();
   const navigate = useNavigate();
   // Once we have the user, send a request to the server to create a new user in our database

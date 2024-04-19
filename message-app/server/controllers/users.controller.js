@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Notification = require("../models/Notification");
 const response = require("../helpers/response");
+const { broadcast } = require("../helpers/websockets");
 
 exports.createOrUpdateUser = async (req, res) => {
   try {
@@ -246,12 +247,23 @@ exports.followUser = async (req, res) => {
     await targetUser.save();
     await currentUser.save();
 
-    const newNotification = new Notification({
+    const notification = new Notification({
       action: "FOLLOW",
       recipient: targetUser._id,
       actor: currentUser._id,
     });
-    await newNotification.save();
+    await notification.save();
+
+    const populatedNotification = await Notification.findById(
+      notification._id
+    ).populate("actor");
+
+    const clients = req.app.locals.clients;
+    const message = {
+      data: populatedNotification,
+      type: "NEW_NOTIFICATION",
+    };
+    broadcast(clients, message, targetUser._id.toString());
 
     return response({
       res,
@@ -360,9 +372,12 @@ exports.notifications = async (req, res) => {
       });
     }
 
-    const notifications = await Notification.find({ recipient: user._id }).sort({
-      createdDate: -1,
-    });
+    const notifications = await Notification.find({ recipient: user._id })
+      .sort({
+        createdDate: -1,
+      })
+      .populate("actor")
+      .populate("recipient");
 
     return response({
       res,

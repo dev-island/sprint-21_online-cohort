@@ -6,11 +6,10 @@ import {
   useEffect,
   useMemo,
 } from "react";
-import { Notification, IUser } from "../types";
+import { Notification } from "../types";
 import { markRead } from "../api/notifications";
 import { getUserNotifications } from "../api/users";
 import useCurrentUser from "../hooks/useCurrentUser";
-import { mockUser } from "../mocks/users";
 
 export type NotificationContextType = {
   notifications: Notification[] | undefined;
@@ -30,18 +29,6 @@ const initState: NotificationContextType = {
   setIsLoading: () => {},
 };
 
-const getMockNotifications = (currentUser: IUser): Notification[] => [
-  {
-    _id: "1",
-    type: "FOLLOW",
-    isRead: false,
-    __v: 0,
-    createdDate: "2021-07-01T00:00:00.000Z",
-    user: currentUser,
-    author: mockUser,
-  },
-];
-
 export const NotificationsContext =
   createContext<NotificationContextType>(initState);
 
@@ -55,6 +42,7 @@ const NotificationsProvider: FC<{ children: ReactNode }> = ({ children }) => {
   }, [notifications]);
 
   const addNotification = (notification: Notification) => {
+    console.log("Adding notification", notification);
     setNotifications((prev) => [notification, ...prev]);
   };
 
@@ -65,12 +53,9 @@ const NotificationsProvider: FC<{ children: ReactNode }> = ({ children }) => {
     );
     if (!notification) return;
     const isRead = !notification.isRead;
-    await markRead(isRead, token);
+    await markRead(isRead, notification._id, token);
     setNotifications((notifications) =>
-      notifications.map((notification) => ({
-        ...notification,
-        isRead,
-      }))
+      notifications.filter((notification) => notification._id !== id)
     );
   };
 
@@ -81,18 +66,14 @@ const NotificationsProvider: FC<{ children: ReactNode }> = ({ children }) => {
       sub: currentUser.sub,
       token,
     });
+
     setNotifications(data);
     setIsLoading(false);
   };
 
   useEffect(() => {
     if (!currentUser?.sub || !token) return;
-
-    // TODO -> Swap with fetchNotifications once BE is working
-    const mockNotifications = getMockNotifications(currentUser);
-    setNotifications(mockNotifications);
-    setIsLoading(false);
-    // fetchNotifications();
+    fetchNotifications();
   }, [currentUser, token]);
 
   return (

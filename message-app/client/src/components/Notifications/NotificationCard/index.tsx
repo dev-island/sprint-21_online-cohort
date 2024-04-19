@@ -1,5 +1,7 @@
 import { FC } from "react";
-import { Text, Image, Flex, Button, Link } from "@chakra-ui/react";
+import { Text, Image, Icon, Flex, Button, Link } from "@chakra-ui/react";
+import { FiCheckCircle } from "react-icons/fi";
+
 import { Notification } from "../../../types";
 
 export type Props = {
@@ -17,20 +19,20 @@ const NotificationCard: FC<Props> = ({
     NEW_MESSAGE: "posted a new message",
   };
 
-  const message = NOTIFICATION_TYPE_TO_MESSAGE[notification.type];
+  const message = NOTIFICATION_TYPE_TO_MESSAGE[notification.action];
 
   return (
     <Flex gap={4}>
       <Flex gap={2} align="center">
         <Image
-          src={notification.author.profileImage}
+          src={notification.actor.profileImage}
           w={8}
           h={8}
           borderRadius="full"
         />
         <Text>
-          <Link href={`/profile/${notification.author.sub}`}>
-            {notification.author.displayName || notification.author.username}
+          <Link href={`/profile/${notification.actor.sub}`}>
+            {notification.actor.displayName || notification.actor.username}
           </Link>{" "}
           {message}
         </Text>
@@ -39,7 +41,7 @@ const NotificationCard: FC<Props> = ({
         variant="link"
         onClick={() => markNotificationRead(notification._id)}
       >
-        {notification.isRead ? "Read" : "Unread"}
+        <Icon as={FiCheckCircle} color="green.500" />
       </Button>
     </Flex>
   );

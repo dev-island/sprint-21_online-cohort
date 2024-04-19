@@ -28,7 +28,7 @@ Implement notifications
    2. Create a new notification in the DB
    3. Broadcast an event to the connected client that matches the target user
       1. Add logic to broadcast to determine if the client we want to send a message to is the target user
-3. A user is notified if someone "likes" their message
+<!-- 3. A user is notified if someone "likes" their message -->
 4. BONUS: A user is notified when one of the people they are following posts a message
 5. BONUS: only authenticated users can see events emitted from the server
 6. BONUS: Fix dupe message when creating a new message (I.e. broadcast shouldn't go to user who created the new message)

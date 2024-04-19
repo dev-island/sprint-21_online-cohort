@@ -1,6 +1,6 @@
 const WebSocket = require("ws");
 
-const broadcast = (clients, message) => {
+const broadcast = (clients, message, targetUserId) => {
   if (!clients || !clients.size) {
     return;
   }
@@ -8,6 +8,10 @@ const broadcast = (clients, message) => {
     if (client.readyState !== WebSocket.OPEN) {
       return;
     }
+    if (targetUserId && client?.userId !== targetUserId) {
+      return;
+    }
+
     client.send(JSON.stringify(message));
   });
 };

@@ -1,10 +1,16 @@
 import { useEffect } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
-import useMessages from "./useMessages";
+import { IMessage, Notification } from "../types";
 
-const useSocket = () => {
-  const { addMessage } = useMessages();
-  const { lastMessage, readyState } = useWebSocket("ws://localhost:3000");
+type SocketProps = {
+  addMessage: (message: IMessage) => void;
+  addNotification: (notification: Notification) => void;
+};
+
+const useSocket = ({ addMessage, addNotification }: SocketProps) => {
+  const { sendMessage, lastMessage, readyState } = useWebSocket(
+    "ws://localhost:3000"
+  );
 
   const connectionStatus = {
     [ReadyState.CONNECTING]: "Connecting",
@@ -20,6 +26,9 @@ const useSocket = () => {
       console.log("Message received: ", type);
       if (type === "NEW_MESSAGE") {
         addMessage(data);
+      } else if (type === "NEW_NOTIFICATION") {
+        console.log("New notification: ", addNotification);
+        addNotification(data);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -28,6 +37,11 @@ const useSocket = () => {
   useEffect(() => {
     console.log("WS Connection status: ", connectionStatus);
   }, [connectionStatus]);
+
+  return {
+    sendMessage,
+    connectionStatus,
+  };
 };
 
 export default useSocket;
