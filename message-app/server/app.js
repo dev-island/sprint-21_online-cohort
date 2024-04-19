@@ -8,6 +8,7 @@ const http = require("http");
 const cors = require("cors");
 const messagesRouter = require("./routes/message.routes");
 const usersRouter = require("./routes/user.routes");
+const notificationsRouter = require("./routes/notification.routes");
 const port = process.env.PORT || "3000";
 const WebSocket = require("ws");
 
@@ -44,6 +45,7 @@ ws.on("connection", (webSocket) => {
 
 app.use("/messages", messagesRouter);
 app.use("/users", usersRouter);
+app.use("/notifications/", notificationsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

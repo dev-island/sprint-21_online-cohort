@@ -21,7 +21,8 @@ Implement notifications
 
 #### Objectives
 1. A user can see a list of notifications (Backend only)
-   1. Add an endpoint to get a list of notifications based on user._id
+   1. add an endpoint to get all notifications: /notifications
+   2. Add an endpoint to get a list of notifications based on user._id (note, we'll be using the user SUB as param, not _id)
 2. A user gets notified if someone follows them
    1. identify target user
    2. Create a new notification in the DB
