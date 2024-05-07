@@ -1,6 +1,16 @@
-import { Box, Flex, Button, Stack, useColorModeValue, useDisclosure } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Icon,
+  Button,
+  Stack,
+  useColorModeValue,
+  useDisclosure,
+} from "@chakra-ui/react";
 import { useAuth0 } from "@auth0/auth0-react";
 import NewMessageModal from "../NewMessageModal";
+import { FiMessageCircle } from "react-icons/fi";
+import Notifications from "../Notifications";
 
 export default function Navbar() {
   const { isOpen, onClose, onOpen } = useDisclosure();
@@ -25,13 +35,19 @@ export default function Navbar() {
           flex={{ base: 1, md: 0 }}
           justify={"flex-end"}
           direction={"row"}
+          align="center"
           spacing={6}
         >
           {isLoading ? null : isAuthenticated ? (
             <>
-              <Button fontSize={"sm"} fontWeight={400} onClick={onOpen}>
-                New Message
-              </Button>
+              <Icon
+                as={FiMessageCircle}
+                _hover={{
+                  cursor: "pointer",
+                }}
+                onClick={onOpen}
+              />
+              <Notifications />
               <Button
                 fontSize={"sm"}
                 fontWeight={400}

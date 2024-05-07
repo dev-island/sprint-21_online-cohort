@@ -3,6 +3,7 @@ import { IUser } from "../types";
 import { useAuth0 } from "@auth0/auth0-react";
 import * as api from "../api/users";
 
+
 export type UserContextType = {
   currentUser: IUser | undefined;
   setCurrentUser: (user: IUser) => void;
@@ -51,7 +52,6 @@ const UserProvider: FC<{ children: ReactNode }> = ({ children }) => {
   };
 
   const fetchCurrentUser = async () => {
-
     if (isLoading || !isAuthenticated || !auth0User?.sub || !token) {
       return;
     }
@@ -75,7 +75,7 @@ const UserProvider: FC<{ children: ReactNode }> = ({ children }) => {
       return;
     }
     const token = await getAccessTokenSilently();
-    console.log("TOKEN", token)
+    console.log("TOKEN", token);
     if (!token) {
       throw new Error("Failed to get token");
     }

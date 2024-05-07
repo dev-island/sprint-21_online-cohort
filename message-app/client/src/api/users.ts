@@ -65,3 +65,21 @@ export const unfollowUser = async (
   });
   return res.json();
 };
+
+type GetUserNotificationsRequest = {
+  sub: string;
+  token: string;
+};
+export const getUserNotifications = async ({
+  sub,
+  token,
+}: GetUserNotificationsRequest) => {
+  const res = await fetch(`${ROOT}/${sub}/notifications`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.json();
+};

@@ -1,5 +1,7 @@
 const User = require("../models/User");
+const Notification = require("../models/Notification");
 const response = require("../helpers/response");
+const { broadcast } = require("../helpers/websockets");
 
 exports.createOrUpdateUser = async (req, res) => {
   try {
@@ -67,7 +69,53 @@ exports.getUser = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ sub }).populate("followers").populate("following");
+    let user = await User.findOne({ sub })
+      .populate("followers")
+      .populate("following");
+
+    if (!user) {
+      user = await User.findById(sub)
+        .populate("followers")
+        .populate("following");
+      if (!user) {
+        return response({
+          res,
+          status: 404,
+          message: "User not found",
+        });
+      }
+    }
+
+    return response({
+      res,
+      status: 200,
+      message: "User found",
+      data: user,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server error");
+    return response({
+      res,
+      status: 500,
+      message: "Server error",
+    });
+  }
+};
+exports.getUserById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return response({
+        res,
+        status: 400,
+        message: "Missing required fields",
+      });
+    }
+
+    const user = await User.findOne({ id })
+      .populate("followers")
+      .populate("following");
     if (!user) {
       return response({
         res,
@@ -91,7 +139,7 @@ exports.getUser = async (req, res) => {
       message: "Server error",
     });
   }
-}
+};
 
 exports.updateUser = async (req, res) => {
   try {
@@ -114,7 +162,9 @@ exports.updateUser = async (req, res) => {
       });
     }
 
-    const updatedUser = await User.findOneAndUpdate({ sub }, body, { new: true });
+    const updatedUser = await User.findOneAndUpdate({ sub }, body, {
+      new: true,
+    });
     return response({
       res,
       status: 200,
@@ -129,7 +179,7 @@ exports.updateUser = async (req, res) => {
       message: "Server error",
     });
   }
-}
+};
 
 exports.listUsers = async (req, res) => {
   try {
@@ -148,7 +198,7 @@ exports.listUsers = async (req, res) => {
       message: "Server error",
     });
   }
-}
+};
 
 exports.followUser = async (req, res) => {
   try {
@@ -181,7 +231,10 @@ exports.followUser = async (req, res) => {
       });
     }
 
-    if (currentUser.following.includes(targetUser._id) || targetUser.followers.includes(currentUserId)) {
+    if (
+      currentUser.following.includes(targetUser._id) ||
+      targetUser.followers.includes(currentUserId)
+    ) {
       return response({
         res,
         status: 400,
@@ -193,7 +246,24 @@ exports.followUser = async (req, res) => {
     currentUser.following.push(targetUser._id);
     await targetUser.save();
     await currentUser.save();
-    // TODO add notification
+
+    const notification = new Notification({
+      action: "FOLLOW",
+      recipient: targetUser._id,
+      actor: currentUser._id,
+    });
+    await notification.save();
+
+    const populatedNotification = await Notification.findById(
+      notification._id
+    ).populate("actor");
+
+    const clients = req.app.locals.clients;
+    const message = {
+      data: populatedNotification,
+      type: "NEW_NOTIFICATION",
+    };
+    broadcast(clients, message, targetUser._id.toString());
 
     return response({
       res,
@@ -202,7 +272,7 @@ exports.followUser = async (req, res) => {
       data: {
         targetUser,
         currentUser,
-      }
+      },
     });
   } catch (error) {
     console.error(error);
@@ -212,7 +282,7 @@ exports.followUser = async (req, res) => {
       message: "Server error",
     });
   }
-}
+};
 
 exports.unFollowUser = async (req, res) => {
   try {
@@ -273,6 +343,51 @@ exports.unFollowUser = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
+    return response({
+      res,
+      status: 500,
+      message: "Server error",
+    });
+  }
+};
+
+exports.notifications = async (req, res) => {
+  try {
+    const { sub } = req.params;
+    if (!sub) {
+      return response({
+        res,
+        status: 400,
+        message: "Missing required fields",
+      });
+    }
+
+    const user = await User.findOne({ sub });
+
+    if (!user) {
+      return response({
+        res,
+        status: 500,
+        message: "Cannot get notifications for nonexistent user",
+      });
+    }
+
+    const notifications = await Notification.find({ recipient: user._id })
+      .sort({
+        createdDate: -1,
+      })
+      .populate("actor")
+      .populate("recipient");
+
+    return response({
+      res,
+      status: 200,
+      message: "Notifications found",
+      data: notifications || [],
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server error");
     return response({
       res,
       status: 500,

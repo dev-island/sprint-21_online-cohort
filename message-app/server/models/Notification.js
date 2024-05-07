@@ -3,21 +3,21 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const MessageSchema = new Schema({
-  type: {
+const NotificationSchema = new Schema({
+  action: {
     type: String,
     required: true,
-    enum: ["LIKE", "FOLLOW", "UNLIKE", "UNFOLLOW"],
+    enum: ["LIKE", "FOLLOW", 'NEW_MESSAGE'],
   },
   createdDate: {
     type: Date,
     default: Date.now,
   },
-  user: {
+  recipient: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
-  author: {
+  actor: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
@@ -27,4 +27,4 @@ const MessageSchema = new Schema({
   },
 });
 
-module.exports = mongoose.model("Message", MessageSchema);
+module.exports = mongoose.model("Notification", NotificationSchema);

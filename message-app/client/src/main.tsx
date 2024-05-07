@@ -7,6 +7,7 @@ import { BrowserRouter } from "react-router-dom";
 import MessagesProvider from "./context/MessagesContext.tsx";
 import { Auth0Provider } from "@auth0/auth0-react";
 import UserProvider from "./context/UserContext.tsx";
+import NotificationsProvider from "./context/NotificationsContext.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -20,11 +21,13 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     >
       <UserProvider>
         <MessagesProvider>
-          <ChakraProvider>
-            <BrowserRouter>
-              <App />
-            </BrowserRouter>
-          </ChakraProvider>
+          <NotificationsProvider>
+            <ChakraProvider>
+              <BrowserRouter>
+                <App />
+              </BrowserRouter>
+            </ChakraProvider>
+          </NotificationsProvider>
         </MessagesProvider>
       </UserProvider>
     </Auth0Provider>
